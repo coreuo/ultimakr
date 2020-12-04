@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace Ultima.Package
 {
@@ -11,8 +13,10 @@ namespace Ultima.Package
 
         public static Dictionary<ulong, string> GetCollection()
         {
-            using var stream = File.OpenRead("Dictionary.bin");
-            
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Ultima.Package.Dictionary.bin");
+
+            if (stream == null) throw new InvalidOperationException("Unable to load Dictionary.");
+
             using var reader = new BinaryReader(stream);
             
             reader.ReadBytes(4);

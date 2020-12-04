@@ -1,10 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Authors>coreuo</Authors>
     <Company>coreuo</Company>
     <PackageId>Ultima.Package</PackageId>
+    <Version>1.0.1</Version>
+    <Description />
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,9 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Dictionary.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="Dictionary.bin" />
   </ItemGroup>
 
   <ItemGroup>
