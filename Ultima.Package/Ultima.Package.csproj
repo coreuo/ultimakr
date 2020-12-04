@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <Authors>coreuo</Authors>
+    <Company>coreuo</Company>
+    <PackageId>Ultima.Package</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
