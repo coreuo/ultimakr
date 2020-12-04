@@ -8,13 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Iconic.Zlib.Netstandard" Version="1.0.0" />
+    <None Remove="Dictionary.bin" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Dictionary.bin">
+    <Content Include="Dictionary.bin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Iconic.Zlib.Netstandard" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
