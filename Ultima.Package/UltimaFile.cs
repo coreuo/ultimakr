@@ -1,0 +1,223 @@
+﻿using System;
+using System.IO;
+using System.Text;
+using Ionic.Zlib;
+
+namespace Ultima.Package
+{
+    public class UltimaFile
+    {
+        public static readonly byte[] Buffer = new byte[32768];
+        
+        public int BlockId { get; }
+
+        public int FileId { get; }
+
+        public long DataOffset { get; private set; }
+        
+        public int DataHeaderSize { get; }
+        
+        public int CompressedDataSize { get; private set; }
+        
+        public int DecompressedDataSize { get; private set; }
+        
+        public ulong FileNameHash { get; set; }
+        
+        public uint DataHeaderHash { get; }
+        
+        public bool DataCompressed { get; set; }
+        
+        public byte[] ModifyWithData { get; set; }
+        
+        public string ModifyWithPath { get; set; }
+        
+        public Action<BinaryWriter> ModifyWithAction { get; set; }
+
+        public UltimaFile(int blockId, int fileId, long dataOffset, int dataHeaderSize, int compressedDataSize, int decompressedDataSize, ulong fileNameHash, uint dataHeaderHash, bool dataCompressed)
+        {
+            BlockId = blockId;
+
+            FileId = fileId;
+            
+            DataOffset = dataOffset;
+            
+            DataHeaderSize = dataHeaderSize;
+            
+            CompressedDataSize = compressedDataSize;
+            
+            DecompressedDataSize = decompressedDataSize;
+            
+            FileNameHash = fileNameHash;
+            
+            DataHeaderHash = dataHeaderHash;
+            
+            DataCompressed = dataCompressed;
+        }
+
+        public override string ToString()
+        {
+            return Dictionary.Collection.TryGetValue(FileNameHash, out var name) ? $"{BlockId}.{FileId} {name}" : $"{BlockId}.{FileId}";
+        }
+
+        public byte[] GetHeader(BinaryReader reader)
+        {
+            reader.BaseStream.Seek(DataOffset, SeekOrigin.Begin);
+
+            return reader.ReadBytes(DataHeaderSize);
+        }
+        
+        public byte[] GetData(BinaryReader reader, bool compressed = false)
+        {
+            using var memoryStream = new MemoryStream();
+
+            GetData(memoryStream, reader, compressed);
+
+            return memoryStream.ToArray();
+        }
+
+        public void GetData(BinaryReader reader, Action<BinaryReader, int> action, bool compressed = false)
+        {
+            reader.BaseStream.Seek(DataOffset + DataHeaderSize, SeekOrigin.Begin);
+
+            if (!DataCompressed || compressed) action(reader, DecompressedDataSize);
+            else
+            {
+                using var zlibStream = new ZlibStream(reader.BaseStream, CompressionMode.Decompress, true);
+                
+                using var zlibReader = new BinaryReader(zlibStream, Encoding.Default, true);
+
+                action(zlibReader, DecompressedDataSize);
+            }
+        }
+
+        public void GetData(Stream stream, BinaryReader reader, bool compressed = false)
+        {
+            reader.BaseStream.Seek(DataOffset + DataHeaderSize, SeekOrigin.Begin);
+            
+            if (!DataCompressed || compressed)
+            {
+                for (var i = CompressedDataSize; i > 0; i -= Buffer.Length)
+                {
+                    var size = i > Buffer.Length ? Buffer.Length : i;
+
+                    reader.Read(Buffer, 0, size);
+
+                    stream.Write(Buffer, 0, size);
+                }
+            }
+            else
+            {
+                using var zlibStream = new ZlibStream(stream, CompressionMode.Decompress);
+
+                for (var i = CompressedDataSize; i > 0; i -= Buffer.Length)
+                {
+                    var size = i > Buffer.Length ? Buffer.Length : i;
+
+                    reader.Read(Buffer, 0, size);
+
+                    zlibStream.Write(Buffer, 0, size);
+                }
+            }
+        }
+
+        public void SetData(BinaryReader reader, BinaryWriter writer, long oldDataOffset, long newDataOffset)
+        {
+            DataOffset = newDataOffset;
+
+            reader.BaseStream.Seek(oldDataOffset, SeekOrigin.Begin);
+
+            writer.BaseStream.Seek(newDataOffset, SeekOrigin.Begin);
+
+            reader.Read(Buffer, 0, DataHeaderSize);
+
+            writer.Write(Buffer, 0, DataHeaderSize);
+
+            reader.BaseStream.Seek(oldDataOffset + DataHeaderSize, SeekOrigin.Begin);
+
+            writer.BaseStream.Seek(newDataOffset + DataHeaderSize, SeekOrigin.Begin);
+
+            if (ModifyWithData != null && !DataCompressed)
+            {
+                writer.Write(ModifyWithData);
+
+                CompressedDataSize = ModifyWithData.Length;
+            }
+            
+            else if (ModifyWithPath != null && !DataCompressed)
+            {
+                using var stream = File.OpenRead(ModifyWithPath);
+                
+                stream.CopyTo(writer.BaseStream);
+
+                CompressedDataSize = (int)stream.Length;
+            }
+            
+            else if (ModifyWithAction != null && !DataCompressed)
+            {
+                ModifyWithAction(writer);
+
+                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset + DataHeaderSize);
+            }
+
+            else if (ModifyWithData != null && DataCompressed)
+            {
+                using var stream = new MemoryStream(ModifyWithData);
+                
+                using var zlib = new ZlibStream(stream, CompressionMode.Compress, CompressionLevel.BestSpeed);
+
+                int read;
+
+                while ((read = zlib.Read(Buffer, 0, Buffer.Length)) != 0) writer.Write(Buffer, 0, read);
+
+                CompressedDataSize = (int)zlib.TotalOut;
+
+                DecompressedDataSize = (int)zlib.TotalIn;
+            }
+            
+            else if (ModifyWithPath != null && DataCompressed)
+            {
+                using var stream = File.OpenRead(ModifyWithPath);
+
+                using var zlib = new ZlibStream(stream, CompressionMode.Compress, CompressionLevel.BestSpeed);
+
+                int read;
+
+                while ((read = zlib.Read(Buffer, 0, Buffer.Length)) != 0) writer.Write(Buffer, 0, read);
+
+                CompressedDataSize = (int)zlib.TotalOut;
+
+                DecompressedDataSize = (int)zlib.TotalIn;
+            }
+
+            else if (ModifyWithAction != null && DataCompressed)
+            {
+                WriteWithAction();
+
+                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset + DataHeaderSize);
+
+                void WriteWithAction()
+                {
+                    using var zlib = new ZlibStream(writer.BaseStream, CompressionMode.Compress, CompressionLevel.BestSpeed, true);
+
+                    using var zlibWriter = new BinaryWriter(zlib);
+
+                    ModifyWithAction(zlibWriter);
+
+                    DecompressedDataSize = (int)zlib.TotalIn;
+                }
+            }
+
+            else
+            {
+                for (var i = CompressedDataSize; i > 0; i -= Buffer.Length)
+                {
+                    var size = i > Buffer.Length ? Buffer.Length : i;
+
+                    reader.Read(Buffer, 0, size);
+                    
+                    writer.Write(Buffer, 0, size);
+                }
+            }
+        }
+    }
+}
