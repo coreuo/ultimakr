@@ -83,6 +83,8 @@ namespace Ultima.Package
                     if (directory == null) throw new InvalidOperationException("Invalid directory.");
                     
                     Directory.CreateDirectory(directory);
+                    
+                    if(File.Exists(fullName)) File.Delete(fullName);
 
                     using var stream = File.OpenWrite(fullName);
 
@@ -103,7 +105,12 @@ namespace Ultima.Package
                     
                     if(!File.Exists(fullName)) continue;
 
-                    file.ModifyWithPath = fullName;
+                    file.Modify = writer =>
+                    {
+                        using var stream = File.OpenRead(fullName);
+                        
+                        stream.CopyTo(writer.BaseStream);
+                    };
                 }
             }
         }

@@ -27,11 +27,7 @@ namespace Ultima.Package
         
         public bool DataCompressed { get; set; }
         
-        public byte[] ModifyWithData { get; set; }
-        
-        public string ModifyWithPath { get; set; }
-        
-        public Action<BinaryWriter> ModifyWithAction { get; set; }
+        public Action<BinaryWriter> Modify { get; set; }
 
         public UltimaFile(int blockId, int fileId, long dataOffset, int dataHeaderSize, int compressedDataSize, int decompressedDataSize, ulong fileNameHash, uint dataHeaderHash, bool dataCompressed)
         {
@@ -136,60 +132,14 @@ namespace Ultima.Package
 
             writer.BaseStream.Seek(newDataOffset + DataHeaderSize, SeekOrigin.Begin);
 
-            if (ModifyWithData != null && !DataCompressed)
+            if (Modify != null && !DataCompressed)
             {
-                writer.Write(ModifyWithData);
-
-                CompressedDataSize = ModifyWithData.Length;
-            }
-            
-            else if (ModifyWithPath != null && !DataCompressed)
-            {
-                using var stream = File.OpenRead(ModifyWithPath);
-                
-                stream.CopyTo(writer.BaseStream);
-
-                CompressedDataSize = (int)stream.Length;
-            }
-            
-            else if (ModifyWithAction != null && !DataCompressed)
-            {
-                ModifyWithAction(writer);
+                Modify(writer);
 
                 CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset + DataHeaderSize);
             }
 
-            else if (ModifyWithData != null && DataCompressed)
-            {
-                using var stream = new MemoryStream(ModifyWithData);
-                
-                using var zlib = new ZlibStream(stream, CompressionMode.Compress, CompressionLevel.BestSpeed);
-
-                int read;
-
-                while ((read = zlib.Read(Buffer, 0, Buffer.Length)) != 0) writer.Write(Buffer, 0, read);
-
-                CompressedDataSize = (int)zlib.TotalOut;
-
-                DecompressedDataSize = (int)zlib.TotalIn;
-            }
-            
-            else if (ModifyWithPath != null && DataCompressed)
-            {
-                using var stream = File.OpenRead(ModifyWithPath);
-
-                using var zlib = new ZlibStream(stream, CompressionMode.Compress, CompressionLevel.BestSpeed);
-
-                int read;
-
-                while ((read = zlib.Read(Buffer, 0, Buffer.Length)) != 0) writer.Write(Buffer, 0, read);
-
-                CompressedDataSize = (int)zlib.TotalOut;
-
-                DecompressedDataSize = (int)zlib.TotalIn;
-            }
-
-            else if (ModifyWithAction != null && DataCompressed)
+            else if (Modify != null && DataCompressed)
             {
                 WriteWithAction();
 
@@ -201,7 +151,7 @@ namespace Ultima.Package
 
                     using var zlibWriter = new BinaryWriter(zlib);
 
-                    ModifyWithAction(zlibWriter);
+                    Modify(zlibWriter);
 
                     DecompressedDataSize = (int)zlib.TotalIn;
                 }

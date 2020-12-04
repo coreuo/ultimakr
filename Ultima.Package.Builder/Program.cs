@@ -52,6 +52,8 @@ namespace Ultima.Package.Builder
                 return -3;
             }
 
+            Console.WriteLine("Export done.");
+
             return 0;
         }
 
@@ -101,6 +103,8 @@ namespace Ultima.Package.Builder
 
                 return -3;
             }
+
+            Console.WriteLine("Import done.");
 
             return 0;
         }
