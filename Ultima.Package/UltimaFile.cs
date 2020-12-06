@@ -136,14 +136,14 @@ namespace Ultima.Package
             {
                 Modify(writer);
 
-                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset + DataHeaderSize);
+                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset - DataHeaderSize);
             }
 
             else if (Modify != null && DataCompressed)
             {
                 WriteWithAction();
 
-                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset + DataHeaderSize);
+                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset - DataHeaderSize);
 
                 void WriteWithAction()
                 {
