@@ -3,9 +3,10 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>coreuo</Authors>
     <Company>coreuo</Company>
+    <RepositoryUrl>https://github.com/coreuo/ultimakr</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
