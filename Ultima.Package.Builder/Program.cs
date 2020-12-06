@@ -11,7 +11,7 @@ namespace Ultima.Package.Builder
             return args.FirstOrDefault() switch
             {
                 "export" when args.Length == 3 => Export(args[1], args[2]),
-                "import" when args.Length == 3 => Import(args[1], args[2]),
+                "import" when args.Length is >= 3 and <= 4 => Import(args[1], args[2], args.Length > 3 && args[3] == "--track"),
                 "--help" => Help(),
                 _ => Help()
             };
@@ -57,8 +57,25 @@ namespace Ultima.Package.Builder
             return 0;
         }
 
-        public static int Import(string packagePath, string importPath)
+        public static int Import(string packagePath, string importPath, bool track = false)
         {
+            var dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Ultima.Package.Builder");
+
+            Directory.CreateDirectory(dataDirectory);
+            
+            var trackPath = Path.Combine(dataDirectory, "track.bin");
+            
+            DateTime? last = null;
+
+            if (track && File.Exists(trackPath))
+            {
+                using var trackStream = File.OpenRead(trackPath);
+
+                using var trackReader = new BinaryReader(trackStream);
+
+                last = DateTime.FromBinary(trackReader.ReadInt64());
+            }
+
             if (!File.Exists(packagePath))
             {
                 Console.WriteLine("Invalid package path.");
@@ -91,7 +108,7 @@ namespace Ultima.Package.Builder
             {
                 var package = UltimaPackage.FromReader(reader);
 
-                package.Import(reader, importPath);
+                package.Import(reader, importPath, last);
                 
                 package.ToWriter(reader, writer);
             }
@@ -102,6 +119,15 @@ namespace Ultima.Package.Builder
                 Console.WriteLine(e);
 
                 return -3;
+            }
+
+            if (track)
+            {
+                using var trackStream = File.OpenWrite(trackPath);
+
+                using var trackWriter = new BinaryWriter(trackStream);
+                
+                trackWriter.Write(DateTime.UtcNow.ToBinary());
             }
 
             Console.WriteLine("Import done.");
@@ -115,7 +141,7 @@ namespace Ultima.Package.Builder
 
             Console.WriteLine($"(c) 2020 CoreUO GPL\n");
 
-            Console.WriteLine("Use export [package] [folder] or import [package] [folder].");
+            Console.WriteLine("Use export [package] [folder] or import [package] [folder] (--track).");
 
             return 0;
         }

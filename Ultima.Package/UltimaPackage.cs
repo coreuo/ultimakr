@@ -93,7 +93,7 @@ namespace Ultima.Package
             }
         }
 
-        public void Import(BinaryReader reader, string path)
+        public void Import(BinaryReader reader, string path, DateTime? last = null)
         {
             foreach (var (block, i) in GetBlocks(reader).Select((b, i) => (b, i)))
             {
@@ -104,6 +104,8 @@ namespace Ultima.Package
                     var fullName = Path.Combine(path, name);
                     
                     if(!File.Exists(fullName)) continue;
+
+                    if (last != null && new FileInfo(fullName).LastWriteTimeUtc < last) continue;
 
                     file.Modify = writer =>
                     {
