@@ -43,7 +43,9 @@ namespace Ultima.Package
             return new UltimaPackage(reader.ReadInt32(), reader.ReadUInt32(), reader.ReadInt64(), reader.ReadInt32(), reader.ReadInt32());
         }
 
-        public void ToWriter(BinaryReader reader, BinaryWriter writer)
+        public void ToWriter(BinaryReader reader, BinaryWriter writer) => ToWriter<object>(reader, writer, null, null);
+
+        public void ToWriter<T>(BinaryReader reader, BinaryWriter writer, T state, Func<BinaryWriter, int, int, T, bool> modifier)
         {
             writer.Write((byte) 'M');
 
@@ -65,7 +67,7 @@ namespace Ultima.Package
 
             for (var i = 28; i < BlockOffset; i++) writer.Write((byte) 0);
             
-            SetBlocks(reader, writer);
+            SetBlocks(reader, writer, state, modifier);
         }
 
         public void Export(BinaryReader reader, string path)
@@ -140,7 +142,7 @@ namespace Ultima.Package
             while (next != 0);
         }
 
-        public void SetBlocks(BinaryReader reader, BinaryWriter writer)
+        public void SetBlocks<T>(BinaryReader reader, BinaryWriter writer, T state, Func<BinaryWriter, int, int, T, bool> modifier)
         {
             var oldBlockOffset = BlockOffset;
 
@@ -168,7 +170,7 @@ namespace Ultima.Package
 
                 var block = _blocks.TryGetValue(oldFileOffset, out var value) ? value : new UltimaBlock(id, oldFileOffset, count);
 
-                block.SetFiles(reader, writer, oldFileOffset, newFileOffset, MaxFilesPerBlock);
+                block.SetFiles(reader, writer, oldFileOffset, newFileOffset, MaxFilesPerBlock, id, state, modifier);
 
                 newBlockOffset = writer.BaseStream.Position;
 

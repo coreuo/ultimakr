@@ -116,7 +116,7 @@ namespace Ultima.Package
             }
         }
 
-        public void SetData(BinaryReader reader, BinaryWriter writer, long oldDataOffset, long newDataOffset)
+        public void SetData<T>(BinaryReader reader, BinaryWriter writer, long oldDataOffset, long newDataOffset, int blockId, int fileId, T state, Func<BinaryWriter, int, int, T, bool> modifier)
         {
             DataOffset = newDataOffset;
 
@@ -132,39 +132,49 @@ namespace Ultima.Package
 
             writer.BaseStream.Seek(newDataOffset + DataHeaderSize, SeekOrigin.Begin);
 
-            if (Modify != null && !DataCompressed)
+            if ((Modify != null || modifier != null) && !DataCompressed)
             {
-                Modify(writer);
+                Modify?.Invoke(writer);
 
-                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset - DataHeaderSize);
+                if (modifier?.Invoke(writer, blockId, fileId, state) == false) Copy();
+
+                else CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset - DataHeaderSize);
             }
 
-            else if (Modify != null && DataCompressed)
+            else if ((Modify != null || modifier != null) && DataCompressed)
             {
-                WriteWithAction();
+                if(WriteWithAction()) CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset - DataHeaderSize);
 
-                CompressedDataSize = (int)(writer.BaseStream.Position - newDataOffset - DataHeaderSize);
+                else Copy();
 
-                void WriteWithAction()
+                bool WriteWithAction()
                 {
                     using var zlib = new ZlibStream(writer.BaseStream, CompressionMode.Compress, CompressionLevel.BestSpeed, true);
 
                     using var zlibWriter = new BinaryWriter(zlib);
 
-                    Modify(zlibWriter);
+                    Modify?.Invoke(zlibWriter);
 
-                    DecompressedDataSize = (int)zlib.TotalIn;
+                    if (modifier?.Invoke(zlibWriter, blockId, fileId, state) == false) return false;
+
+                    DecompressedDataSize = (int) zlib.TotalIn;
+
+                    return true;
                 }
             }
 
-            else
+            else Copy();
+
+            void Copy()
             {
+                writer.BaseStream.Seek(newDataOffset + DataHeaderSize, SeekOrigin.Begin);
+
                 for (var i = CompressedDataSize; i > 0; i -= Buffer.Length)
                 {
                     var size = i > Buffer.Length ? Buffer.Length : i;
 
                     reader.Read(Buffer, 0, size);
-                    
+
                     writer.Write(Buffer, 0, size);
                 }
             }

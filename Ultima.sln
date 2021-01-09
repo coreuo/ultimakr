@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ultima.Package", "Ultima.Package\Ultima.Package.csproj", "{A7C5DC8E-1D5E-469A-8A0F-E742550FBA51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultima.Package", "Ultima.Package\Ultima.Package.csproj", "{A7C5DC8E-1D5E-469A-8A0F-E742550FBA51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ultima.Package.Builder", "Ultima.Package.Builder\Ultima.Package.Builder.csproj", "{9E2BC22F-DFDC-4221-B71C-7E2F13EB9D2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultima.Package.Builder", "Ultima.Package.Builder\Ultima.Package.Builder.csproj", "{9E2BC22F-DFDC-4221-B71C-7E2F13EB9D2A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultima.Map", "Ultima.Map\Ultima.Map.csproj", "{B11E8B18-D80C-4732-92CE-AC4283191FA3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultima.Map.Builder", "Ultima.Map.Builder\Ultima.Map.Builder.csproj", "{AE515048-30D4-4F35-A56B-61FCE15B5678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ultima.Map.Builder.UI", "Ultima.Map.Builder.UI\Ultima.Map.Builder.UI.csproj", "{3DB5F6E6-D91B-4C88-BE4F-34E6F6806030}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +27,18 @@ Global
 		{9E2BC22F-DFDC-4221-B71C-7E2F13EB9D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E2BC22F-DFDC-4221-B71C-7E2F13EB9D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E2BC22F-DFDC-4221-B71C-7E2F13EB9D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B11E8B18-D80C-4732-92CE-AC4283191FA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B11E8B18-D80C-4732-92CE-AC4283191FA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B11E8B18-D80C-4732-92CE-AC4283191FA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B11E8B18-D80C-4732-92CE-AC4283191FA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE515048-30D4-4F35-A56B-61FCE15B5678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE515048-30D4-4F35-A56B-61FCE15B5678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE515048-30D4-4F35-A56B-61FCE15B5678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE515048-30D4-4F35-A56B-61FCE15B5678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DB5F6E6-D91B-4C88-BE4F-34E6F6806030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DB5F6E6-D91B-4C88-BE4F-34E6F6806030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DB5F6E6-D91B-4C88-BE4F-34E6F6806030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DB5F6E6-D91B-4C88-BE4F-34E6F6806030}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

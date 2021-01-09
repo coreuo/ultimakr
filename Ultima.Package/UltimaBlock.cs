@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Ultima.Package
@@ -41,7 +42,7 @@ namespace Ultima.Package
             }
         }
 
-        public void SetFiles(BinaryReader reader, BinaryWriter writer, long oldFileOffset, long newFileOffset, int maxFiles)
+        public void SetFiles<T>(BinaryReader reader, BinaryWriter writer, long oldFileOffset, long newFileOffset, int maxFiles, int blockId, T state, Func<BinaryWriter, int, int, T, bool> modifier)
         {
             FileOffset = newFileOffset;
 
@@ -57,7 +58,7 @@ namespace Ultima.Package
                 
                 var oldDataSize = file.DataHeaderSize + file.CompressedDataSize;
 
-                file.SetData(reader, writer, oldDataOffset, newDataOffset);
+                file.SetData(reader, writer, oldDataOffset, newDataOffset, blockId, i, state, modifier);
 
                 oldDataOffset += oldDataSize;
 
