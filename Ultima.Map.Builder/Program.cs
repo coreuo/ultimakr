@@ -87,7 +87,7 @@ namespace Ultima.Map.Builder
 
         public static int Help()
         {
-            Console.WriteLine($"UltimaKR Map Builder v1.1.0");
+            Console.WriteLine($"UltimaKR Map Builder v1.1.1");
 
             Console.WriteLine($"(c) 2021 CoreUO GPL\n");
 

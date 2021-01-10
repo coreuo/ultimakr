@@ -108,21 +108,21 @@ namespace Ultima.Map
 
                     delimiters.Clear();
 
-                    if (x % 64 == 0) delimiters.Add(c => WriteDelimiter(x - 1, y, 0, c));
+                    if (x % 64 == 0) AddDelimiter(x - 1, y, 0);
 
-                    if (x % 64 == 0 && y % 64 == 0) delimiters.Add(c => WriteDelimiter(x - 1, y - 1, 1, c));
+                    if (x % 64 == 0 && y % 64 == 0) AddDelimiter(x - 1, y - 1, 1);
 
-                    if (y % 64 == 0) delimiters.Add(c => WriteDelimiter(x, y - 1, 2, c));
+                    if (y % 64 == 0) AddDelimiter(x, y - 1, 2);
 
-                    if ((x + 1) % 64 == 0) delimiters.Add(c => WriteDelimiter(x + 1, y, 3, c));
+                    if ((x + 1) % 64 == 0) AddDelimiter(x + 1, y, 3);
 
-                    if ((x + 1) % 64 == 0 && (y + 1) % 64 == 0) delimiters.Add(c => WriteDelimiter(x + 1, y + 1, 4, c));
+                    if ((x + 1) % 64 == 0 && (y + 1) % 64 == 0) AddDelimiter(x + 1, y + 1, 4);
 
-                    if ((y + 1) % 64 == 0) delimiters.Add(c => WriteDelimiter(x, y + 1, 5, c));
+                    if ((y + 1) % 64 == 0) AddDelimiter(x, y + 1, 5);
 
-                    if (x % 64 == 0 && (y + 1) % 64 == 0) delimiters.Add(c => WriteDelimiter(x - 1, y + 1, 6, c));
+                    if (x % 64 == 0 && (y + 1) % 64 == 0) AddDelimiter(x - 1, y + 1, 6);
 
-                    if (y % 64 == 0 && (x + 1) % 64 == 0) delimiters.Add(c => WriteDelimiter(x + 1, y - 1, 7, c));
+                    if (y % 64 == 0 && (x + 1) % 64 == 0) AddDelimiter(x + 1, y - 1, 7);
 
                     for (var l = 0; l < delimiters.Count; l++)
                     {
@@ -131,9 +131,9 @@ namespace Ultima.Map
                         else delimiters[l].Invoke(0);
                     }
 
-                    void WriteDelimiter(int refX, int refY, byte direction, byte count)
+                    void AddDelimiter(int refX, int refY, byte direction)
                     {
-                        if (refX < 0 || refX >= width || refY < 0 || refY >= height) return;
+                        if (refX < 0 || refY < 0) return;
 
                         var (refMulMapBlock, refMulBlockIndex) = GetMulIndexFromCoordinates(refX, refY, s.height);
 
@@ -141,6 +141,11 @@ namespace Ultima.Map
 
                         if (refMulOffset >= s.mapReader.BaseStream.Length) return;
 
+                        delimiters.Add(c => WriteDelimiter(refMulOffset, direction, c));
+                    }
+
+                    void WriteDelimiter(int refMulOffset, byte direction, byte count)
+                    {
                         s.mapReader.BaseStream.Seek(refMulOffset, SeekOrigin.Begin);
 
                         var value = s.mapReader.ReadUInt16();

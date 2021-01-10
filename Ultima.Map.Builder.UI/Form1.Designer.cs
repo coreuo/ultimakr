@@ -55,8 +55,8 @@ namespace Ultima.Map.Builder.UI
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.openFileDialog5 = new System.Windows.Forms.OpenFileDialog();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -268,6 +268,18 @@ namespace Ultima.Map.Builder.UI
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "ML to KR Converter";
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox1.Location = new System.Drawing.Point(827, 57);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(67, 29);
+            this.checkBox1.TabIndex = 14;
+            this.checkBox1.Text = "fast";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.button4);
@@ -289,18 +301,6 @@ namespace Ultima.Map.Builder.UI
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ultima Online Mondain\'s Legacy (ML)";
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Checked = true;
-            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox1.Location = new System.Drawing.Point(827, 57);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(67, 29);
-            this.checkBox1.TabIndex = 14;
-            this.checkBox1.Text = "fast";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -311,7 +311,7 @@ namespace Ultima.Map.Builder.UI
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "UltimaKR Map Builder v1.1.0";
+            this.Text = "UltimaKR Map Builder v1.1.1";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();

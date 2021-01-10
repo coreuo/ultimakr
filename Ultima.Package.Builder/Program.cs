@@ -137,7 +137,7 @@ namespace Ultima.Package.Builder
 
         public static int Help()
         {
-            Console.WriteLine($"UltimaKR Package Builder v1.1.0");
+            Console.WriteLine($"UltimaKR Package Builder v1.1.1");
 
             Console.WriteLine($"(c) 2020 CoreUO GPL\n");
 
