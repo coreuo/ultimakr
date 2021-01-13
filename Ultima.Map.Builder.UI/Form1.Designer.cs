@@ -311,7 +311,7 @@ namespace Ultima.Map.Builder.UI
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
             this.Name = "Form1";
-            this.Text = "UltimaKR Map Builder v1.1.1";
+            this.Text = "UltimaKR Map Builder v1.1.2";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();

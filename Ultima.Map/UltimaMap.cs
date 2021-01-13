@@ -75,7 +75,7 @@ namespace Ultima.Map
 
                         byte unknown = 0;
 
-                        if (Dictionary.Values.TryGetValue(value, out var val))
+                        if (TileCollection.Values.TryGetValue(value, out var val))
                         {
                             graphic = val.Item1;
 
@@ -156,7 +156,7 @@ namespace Ultima.Map
 
                         byte unknown = 0;
 
-                        if (Dictionary.Values.TryGetValue(value, out var val))
+                        if (TileCollection.Values.TryGetValue(value, out var val))
                         {
                             graphic = val.Item1;
 
@@ -204,7 +204,11 @@ namespace Ultima.Map
 
                             var tileStatics = blockStatics.TryGetValue((staticX, staticY), out var entry) ? entry : blockStatics[(staticX, staticY)] = new List<(ushort value, sbyte altitude, ushort unknown, ushort hue)>();
 
-                            tileStatics.Add((staticsValue, s.staticsReader.ReadSByte(), s.staticsReader.ReadUInt16(), s.radarReader.ReadUInt16()));
+                            var current = (staticsValue, s.staticsReader.ReadSByte(), s.staticsReader.ReadUInt16(), s.radarReader.ReadUInt16());
+
+                            if (!StaticCollection.Values.Contains(staticsValue)) continue;
+
+                            tileStatics.Add(current);
                         }
                     }
 
@@ -218,11 +222,11 @@ namespace Ultima.Map
 
                         w.Write(@static.value);
 
-                        w.Write(@static.unknown);
+                        w.Write((ushort)0);
 
                         w.Write(@static.altitude);
 
-                        w.Write(@static.hue);
+                        w.Write(@static.unknown > 0 && @static.unknown < 0xB27 ? @static.unknown : @static.hue);
                     }
                 }
 
