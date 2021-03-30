@@ -157,7 +157,7 @@ namespace Ultima.Map.Builder.UI
         {
             if (openFileDialog4.ShowDialog() == DialogResult.OK)
             {
-                textBox4.Text = openFileDialog3.FileName;
+                textBox4.Text = openFileDialog4.FileName;
             }
         }
 
@@ -165,7 +165,7 @@ namespace Ultima.Map.Builder.UI
         {
             if (openFileDialog5.ShowDialog() == DialogResult.OK)
             {
-                textBox5.Text = openFileDialog3.FileName;
+                textBox5.Text = openFileDialog5.FileName;
             }
         }
 
